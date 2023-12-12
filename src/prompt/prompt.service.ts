@@ -8,28 +8,28 @@ import * as PROMPTS from './prompts.json';
 export class PromptService implements OnModuleInit {
   constructor(@InjectModel(Prompt.name) private promptModel: Model<Prompt>) {}
 
-  async onModuleInit() {
+  async onModuleInit(): Promise<void> {
     console.log('Initializing PromptService');
     await this.initialize();
   }
 
   public async initialize(): Promise<void> {
-    Object.entries(PROMPTS)
-      .map(([key, value]) => ({ name: key, content: value }))
-      .forEach(async (prompt) => {
-        const existingPrompt = await this.promptModel.findOne({ name: prompt.name });
-        if (!existingPrompt) {
-          console.log('Creating prompt: ', prompt.name);
-          const newPrompt = new this.promptModel(prompt);
-          await newPrompt.save();
-        }
-      });
+    for (const [key, value] of Object.entries(PROMPTS)) {
+      const prompt = { name: key, content: value };
+      const existingPrompt = await this.promptModel.findOne({ name: prompt.name });
+
+      if (!existingPrompt) {
+        console.log('Creating prompt: ', prompt.name);
+        const newPrompt = new this.promptModel(prompt);
+        await newPrompt.save();
+      }
+    }
   }
 
   public async get(name: string): Promise<string> {
     const prompt = await this.promptModel.findOne({ name });
 
-    if (prompt) {
+    if (prompt && prompt.content) {
       return prompt.content;
     }
 

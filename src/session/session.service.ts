@@ -31,6 +31,12 @@ export class SessionService {
     if (!classroom) {
       throw new HttpException(`Classroom not found: ${createSessionDto.classroomId}`, HttpStatus.NOT_FOUND);
     }
+    if (!classroom.persona) {
+      throw new HttpException(`Persona not found for classroom: ${createSessionDto.classroomId}`, HttpStatus.NOT_FOUND);
+    }
+    if (!classroom.topic) {
+      throw new HttpException(`Topic not found for classroom: ${createSessionDto.classroomId}`, HttpStatus.NOT_FOUND);
+    }
     const session = new this.sessionModel();
     const chat = new this.chatModel();
     const chatConfig = new this.chatConfigModel();
@@ -73,16 +79,30 @@ export class SessionService {
     return session;
   }
 
-  async update(updateSessionDto: UpdateSessionDto): Promise<Session> {
+  async update(id: string, updateSessionDto: UpdateSessionDto): Promise<Session> {
     const session = await this.sessionModel
-      .findById(updateSessionDto.sessionId)
-      .populate({
-        path: 'classroom',
-        populate: {
-          path: 'persona',
+      .findById(id)
+      .populate([
+        'chat',
+        {
+          path: 'classroom',
+          populate: {
+            path: 'persona',
+          },
         },
-      })
+        {
+          path: 'classroom',
+          populate: {
+            path: 'topic',
+          },
+        },
+      ])
       .exec();
+
+    if (!session) {
+      throw new HttpException(`Session not found: ${id}`, HttpStatus.NOT_FOUND);
+    }
+
     session.chat.messages.push({
       content: updateSessionDto.userMessage,
       role: Roles.User,

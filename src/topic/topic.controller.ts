@@ -12,6 +12,7 @@ export class TopicController {
     const topics = await this.topicService.findAll();
     return topics.map((topic) => {
       return new Topic({
+        _id: topic._id,
         name: topic.name,
         description: topic.description,
       });

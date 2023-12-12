@@ -1,6 +1,6 @@
-import { Body, ClassSerializerInterceptor, Controller, Post, Put, UseInterceptors } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Param, Post, Put, UseInterceptors } from '@nestjs/common';
 import { CreateSessionDto } from './dtos/create-session.dto';
-import { UpdateSessionDto } from './dtos/update-session.dto';
+import { UpdateSessionDto, UpdateSessionParams } from './dtos/update-session.dto';
 import { SessionService } from './session.service';
 import { Session } from './schemas/session.schema';
 
@@ -13,6 +13,7 @@ export class SessionController {
   async create(@Body() createSessionDto: CreateSessionDto): Promise<Session> {
     const session = await this.sessionService.create(createSessionDto);
     return new Session({
+      _id: session._id,
       classroom: session.classroom,
       chat: session.chat,
       status: session.status,
@@ -21,8 +22,16 @@ export class SessionController {
     });
   }
 
-  @Put()
-  async update(@Body() updateSessionDto: UpdateSessionDto) {
-    return await this.sessionService.update(updateSessionDto);
+  @Put(':id')
+  async update(@Param() params: UpdateSessionParams, @Body() updateSessionDto: UpdateSessionDto) {
+    const session = await this.sessionService.update(params.id, updateSessionDto);
+    return new Session({
+      _id: session._id,
+      classroom: session.classroom,
+      chat: session.chat,
+      status: session.status,
+      maxToken: session.maxToken,
+      userId: session.userId,
+    });
   }
 }

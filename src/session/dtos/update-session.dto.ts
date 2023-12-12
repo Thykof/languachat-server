@@ -1,4 +1,7 @@
+export class UpdateSessionParams {
+  id: string;
+}
+
 export class UpdateSessionDto {
-  sessionId: string;
   userMessage: string;
 }

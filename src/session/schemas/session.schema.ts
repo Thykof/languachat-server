@@ -20,6 +20,9 @@ export class Session {
     Object.assign(this, partial);
   }
 
+  @Transform((params) => params.obj._id.toString())
+  _id: Types.ObjectId;
+
   @Transform((param) => {
     const classroom = param.value as Classroom;
     return new Classroom({

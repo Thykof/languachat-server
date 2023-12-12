@@ -12,6 +12,7 @@ export class PersonaController {
     const personas = await this.personaService.findAll();
     return personas.map((persona) => {
       return new Persona({
+        _id: persona._id,
         name: persona.name,
         description: persona.description,
         voice: persona.voice,

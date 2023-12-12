@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Persona } from 'src/persona/schemas/persona.schema';
 import { Topic } from 'src/topic/schemas/topic.schema';
 import { Transform } from 'class-transformer';
@@ -27,6 +27,9 @@ export class Classroom {
   constructor(partial: Partial<Classroom>) {
     Object.assign(this, partial);
   }
+
+  @Transform((params) => params.obj._id.toString())
+  _id: Types.ObjectId;
 
   @Prop()
   name: string;

@@ -12,6 +12,7 @@ export class ClassroomController {
     const classrooms = await this.classroomService.findAll();
     return classrooms.map((classroom) => {
       return new Classroom({
+        _id: classroom._id,
         name: classroom.name,
         topic: classroom.topic,
         language: classroom.language,

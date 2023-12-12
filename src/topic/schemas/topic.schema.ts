@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import { Exclude } from 'class-transformer';
+import { HydratedDocument, Types } from 'mongoose';
+import { Exclude, Transform } from 'class-transformer';
 
 export type TopicDocument = HydratedDocument<Topic>;
 
@@ -9,6 +9,9 @@ export class Topic {
   constructor(partial: Partial<Topic>) {
     Object.assign(this, partial);
   }
+
+  @Transform((params) => params.obj._id.toString())
+  _id: Types.ObjectId;
 
   // The user chose the topic by the name, the name is in the first assistant message
   @Prop()
