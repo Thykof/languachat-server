@@ -41,7 +41,7 @@ export class PersonaService implements OnModuleInit {
     throw new Error(`Persona not found: ${name}`);
   }
 
-  public async getAll(): Promise<Persona[]> {
+  public async findAll(): Promise<Persona[]> {
     return await this.personaModel.find().exec();
   }
 }

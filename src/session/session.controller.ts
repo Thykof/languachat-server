@@ -21,7 +21,6 @@ export class SessionController {
     });
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Put()
   async update(@Body() updateSessionDto: UpdateSessionDto) {
     return await this.sessionService.update(updateSessionDto);

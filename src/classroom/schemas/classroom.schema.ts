@@ -3,6 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Persona } from 'src/persona/schemas/persona.schema';
 import { Topic } from 'src/topic/schemas/topic.schema';
 import { Transform } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 
 export type ClassroomDocument = HydratedDocument<Classroom>;
 
@@ -57,6 +58,7 @@ export class Classroom {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Persona' })
   persona: Persona;
 
+  @Exclude()
   @Prop()
   finalSystemMessage: string;
 }

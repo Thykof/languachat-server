@@ -37,7 +37,7 @@ export class ClassroomService implements OnModuleInit {
     }
   }
 
-  public async getAll(): Promise<Classroom[]> {
-    return await this.classroomModel.find().exec();
+  public async findAll(): Promise<Classroom[]> {
+    return await this.classroomModel.find().populate(['persona', 'topic']).exec();
   }
 }

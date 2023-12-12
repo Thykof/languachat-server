@@ -39,7 +39,7 @@ export class TopicService implements OnModuleInit {
     throw new Error(`Topic not found: ${name}`);
   }
 
-  public async getAll(): Promise<Topic[]> {
+  public async findAll(): Promise<Topic[]> {
     return await this.topicModel.find().exec();
   }
 }
