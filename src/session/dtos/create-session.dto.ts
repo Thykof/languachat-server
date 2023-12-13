@@ -1,3 +1,7 @@
 export class CreateSessionDto {
-  classroomId: string;
+  language: string;
+
+  public toString(): string {
+    return `CreateSessionDto(language=${this.language})`;
+  }
 }

@@ -42,17 +42,25 @@ export class SessionService {
 
   async create(createSessionDto: CreateSessionDto): Promise<Session> {
     const classroom = await this.classroomModel
-      .findById(createSessionDto.classroomId)
+      .findOne({
+        language: createSessionDto.language,
+      })
       .populate(['persona', 'topic'])
       .exec();
     if (!classroom) {
-      throw new HttpException(`Classroom not found: ${createSessionDto.classroomId}`, HttpStatus.NOT_FOUND);
+      throw new HttpException(`Classroom not found: ${Object.values(createSessionDto)}`, HttpStatus.NOT_FOUND);
     }
     if (!classroom.persona) {
-      throw new HttpException(`Persona not found for classroom: ${createSessionDto.classroomId}`, HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        `Persona not found for classroom: ${Object.values(createSessionDto)}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
     if (!classroom.topic) {
-      throw new HttpException(`Topic not found for classroom: ${createSessionDto.classroomId}`, HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        `Topic not found for classroom: ${Object.values(createSessionDto)}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
     const session = new this.sessionModel();
     const chat = new this.chatModel();
