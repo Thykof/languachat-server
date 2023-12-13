@@ -12,7 +12,7 @@ import { Classroom } from 'src/classroom/schemas/classroom.schema';
 import { ConfigService } from '@nestjs/config';
 import { ChatConfig, ChatModelName } from 'src/chat/schemas/chat-config.schema';
 
-const MAX_TOKENS = 850;
+const MAX_TOKENS = 1;
 const DEFAULT_MODEL = 'DEFAULT_MODEL';
 
 @Injectable()
@@ -156,6 +156,10 @@ export class SessionService {
 
     if (!session) {
       throw new HttpException(`Session not found: ${id}`, HttpStatus.NOT_FOUND);
+    }
+
+    if (session.status === SessionStatus.Ended) {
+      throw new HttpException(`Session has ended: ${id}`, HttpStatus.BAD_REQUEST);
     }
 
     session.chat.messages.push({
