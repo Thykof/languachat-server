@@ -12,7 +12,7 @@ import { Classroom } from 'src/classroom/schemas/classroom.schema';
 import { ConfigService } from '@nestjs/config';
 import { ChatConfig, ChatModelName } from 'src/chat/schemas/chat-config.schema';
 
-const MAX_TOKENS = 2048;
+const MAX_TOKENS = 850;
 const DEFAULT_MODEL = 'DEFAULT_MODEL';
 
 @Injectable()
@@ -68,7 +68,7 @@ export class SessionService {
     const chat = new this.chatModel();
     const chatConfig = new this.chatConfigModel();
     chatConfig.chatModelName = this.model;
-    chatConfig.temperature = 1.3;
+    chatConfig.temperature = 0.6;
     chatConfig.frequencyPenalty = 1;
     chatConfig.presencePenalty = 1;
     chat.config = chatConfig;
