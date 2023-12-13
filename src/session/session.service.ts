@@ -64,6 +64,7 @@ export class SessionService {
       );
     }
     const session = new this.sessionModel();
+    session.userId = new mongoose.Types.ObjectId();
     const chat = new this.chatModel();
     const chatConfig = new this.chatConfigModel();
     chatConfig.chatModelName = this.model;
@@ -73,32 +74,31 @@ export class SessionService {
     chat.config = chatConfig;
     let baseSystemPrompt: string;
     let levelPrompt: string;
-    let firstAssistantMessage: string;
     try {
       baseSystemPrompt = await this.promptService.get('base-system');
       levelPrompt = await this.promptService.get(`level-${classroom.level}`);
-      firstAssistantMessage = await this.promptService.get(`first-assistant-${classroom.language}`);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    const firstMessage = firstAssistantMessage.replace('{topic}', classroom.topic.name);
     chat.messages = [
-      {
-        content: `${classroom.persona.prompt}\n${baseSystemPrompt}\n${levelPrompt}\nThe topic of the session is: ${classroom.topic.prompt}`,
+      new Message({
+        content: `${classroom.persona.prompt}\n${baseSystemPrompt}\n${levelPrompt}\nThe topic of the session is: ${classroom.topic.prompt}\nThe language is ${classroom.language}`,
         role: Roles.System,
-        speech: null,
-      },
-      {
-        content: firstMessage,
-        role: Roles.Assistant,
-        speech: await this.chatService.toSpeech(firstMessage, classroom.persona.voice),
-      },
+      }),
     ];
+    const firstMessage = await this.chatService.generateResponse(chat, session.userId.toString());
+    const firstMessageContent = firstMessage.choices[0].message.content;
+    chat.messages.push(
+      new Message({
+        content: firstMessageContent,
+        role: Roles.Assistant,
+        speech: await this.chatService.toSpeech(firstMessageContent, classroom.persona.voice),
+      }),
+    );
     chat.tokenCount = 0; // start with 0 because we update with the total tokens used after each response
     session.classroom = classroom;
     session.chat = chat;
     session.status = SessionStatus.Active;
-    session.userId = new mongoose.Types.ObjectId();
     session.maxToken = MAX_TOKENS;
     await session.save();
 
@@ -142,11 +142,13 @@ export class SessionService {
     const assistantResponse = await this.chatService.generateResponse(session.chat, session.userId.toString());
     const content = assistantResponse.choices[0].message.content;
     const speech = await this.chatService.toSpeech(content, session.classroom.persona.voice);
-    session.chat.messages.push({
-      content,
-      role: Roles.Assistant,
-      speech,
-    });
+    session.chat.messages.push(
+      new Message({
+        content,
+        role: Roles.Assistant,
+        speech,
+      }),
+    );
 
     await session.save();
 
