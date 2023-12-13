@@ -9,8 +9,10 @@ import { Roles } from 'src/chat/schemas/message.schema';
 import { UpdateSessionDto } from './dtos/update-session.dto';
 import { PromptService } from 'src/prompt/prompt.service';
 import { Classroom } from 'src/classroom/schemas/classroom.schema';
+import { ConfigService } from '@nestjs/config';
 
 const MAX_TOKENS = 2048;
+const DEFAULT_MODEL = 'DEFAULT_MODEL';
 
 @Injectable()
 export class SessionService {
@@ -21,7 +23,22 @@ export class SessionService {
     @InjectModel(ChatConfig.name) private chatConfigModel: Model<ChatConfig>,
     private chatService: ChatService,
     private promptService: PromptService,
+    private configService: ConfigService,
   ) {}
+
+  model: ChatModelName;
+
+  onModuleInit(): void {
+    console.log('Initializing SessionService');
+    const modelInEnv = this.configService.get(DEFAULT_MODEL);
+    if (modelInEnv && (Object.values(ChatModelName) as unknown[]).includes(modelInEnv)) {
+      this.model = modelInEnv;
+    } else {
+      console.log(`invalid model in env var '${modelInEnv}' using default model`);
+      this.model = ChatModelName.GPT4Turbo;
+    }
+    console.log('Using model: ', this.model);
+  }
 
   async create(createSessionDto: CreateSessionDto): Promise<Session> {
     const classroom = await this.classroomModel
@@ -40,7 +57,7 @@ export class SessionService {
     const session = new this.sessionModel();
     const chat = new this.chatModel();
     const chatConfig = new this.chatConfigModel();
-    chatConfig.chatModelName = ChatModelName.GPT35;
+    chatConfig.chatModelName = this.model;
     chatConfig.temperature = 1.3;
     chatConfig.frequencyPenalty = 1;
     chatConfig.presencePenalty = 1;
@@ -58,7 +75,7 @@ export class SessionService {
     const firstMessage = firstAssistantMessage.replace('{topic}', classroom.topic.name);
     chat.messages = [
       {
-        content: `${classroom.persona.prompt}\n${baseSystemPrompt}\n${levelPrompt}\nThe topic of the session is: ${classroom.topic.prompt}.`,
+        content: `${classroom.persona.prompt}\n${baseSystemPrompt}\n${levelPrompt}\nThe topic of the session is: ${classroom.topic.prompt}`,
         role: Roles.System,
         speech: null,
       },

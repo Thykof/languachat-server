@@ -4,13 +4,15 @@ import { Chat, ChatModelName } from './schemas/chat.schema';
 import { ConfigService } from '@nestjs/config';
 import { Voice } from 'src/persona/schemas/persona.schema';
 
+const OPENAI_API_KEY = 'OPENAI_API_KEY';
+
 @Injectable()
 export class ChatService {
   private openai: OpenAI;
 
   constructor(private configService: ConfigService) {
     this.openai = new OpenAI({
-      apiKey: this.configService.get('OPENAI_API_KEY'),
+      apiKey: this.configService.get(OPENAI_API_KEY),
     });
   }
 
