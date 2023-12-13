@@ -51,6 +51,9 @@ export class ChatService {
   }
 
   public async toSpeech(message: string, voice: Voice): Promise<Buffer> {
+    if (this.enableSpeech === false) {
+      return;
+    }
     const audio = await this.openai.audio.speech.create({
       model: ChatModelName.TTS1,
       voice,
