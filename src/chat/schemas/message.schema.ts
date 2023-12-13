@@ -11,6 +11,10 @@ export enum Roles {
 
 @Schema()
 export class Message {
+  constructor(partial: Partial<Message>) {
+    Object.assign(this, partial);
+  }
+
   @Prop()
   content: string;
 

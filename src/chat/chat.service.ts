@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import OpenAI from 'openai';
-import { Chat, ChatModelName } from './schemas/chat.schema';
+import { Chat } from './schemas/chat.schema';
 import { ConfigService } from '@nestjs/config';
 import { Voice } from 'src/persona/schemas/persona.schema';
+import { ChatModelName } from './schemas/chat-config.schema';
 
 const OPENAI_API_KEY = 'OPENAI_API_KEY';
 const ENABLE_SPEECH = 'ENABLE_SPEECH';
@@ -45,6 +46,8 @@ export class ChatService {
 
     if (response.usage) {
       chat.tokenCount = response.usage.total_tokens;
+    } else {
+      console.warn('No usage data in response');
     }
 
     return response;

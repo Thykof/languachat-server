@@ -4,12 +4,13 @@ import { Session, SessionSchema } from './schemas/session.schema';
 import { SessionController } from './session.controller';
 import { SessionService } from './session.service';
 import { ChatModule } from 'src/chat/chat.module';
-import { Chat, ChatConfig, ChatConfigSchema, ChatSchema } from 'src/chat/schemas/chat.schema';
+import { Chat, ChatSchema } from 'src/chat/schemas/chat.schema';
 import { PromptModule } from 'src/prompt/prompt.module';
 import { Classroom, ClassroomSchema } from 'src/classroom/schemas/classroom.schema';
 import { Persona, PersonaSchema } from 'src/persona/schemas/persona.schema';
 import { ClassroomModule } from 'src/classroom/classroom.module';
 import { Topic, TopicSchema } from 'src/topic/schemas/topic.schema';
+import { ChatConfig, ChatConfigSchema } from 'src/chat/schemas/chat-config.schema';
 
 @Module({
   imports: [

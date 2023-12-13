@@ -4,12 +4,13 @@ import { Session, SessionStatus } from './schemas/session.schema';
 import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateSessionDto } from './dtos/create-session.dto';
-import { Chat, ChatConfig, ChatModelName } from 'src/chat/schemas/chat.schema';
-import { Roles } from 'src/chat/schemas/message.schema';
+import { Chat } from 'src/chat/schemas/chat.schema';
+import { Message, Roles } from 'src/chat/schemas/message.schema';
 import { UpdateSessionDto } from './dtos/update-session.dto';
 import { PromptService } from 'src/prompt/prompt.service';
 import { Classroom } from 'src/classroom/schemas/classroom.schema';
 import { ConfigService } from '@nestjs/config';
+import { ChatConfig, ChatModelName } from 'src/chat/schemas/chat-config.schema';
 
 const MAX_TOKENS = 2048;
 const DEFAULT_MODEL = 'DEFAULT_MODEL';
