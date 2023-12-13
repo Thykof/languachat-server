@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { Voice } from 'src/persona/schemas/persona.schema';
 
 const OPENAI_API_KEY = 'OPENAI_API_KEY';
+const ENABLE_SPEECH = 'ENABLE_SPEECH';
 
 @Injectable()
 export class ChatService {
@@ -14,6 +15,19 @@ export class ChatService {
     this.openai = new OpenAI({
       apiKey: this.configService.get(OPENAI_API_KEY),
     });
+  }
+
+  enableSpeech: boolean;
+
+  onModuleInit(): void {
+    console.log('ChatService');
+    const enableSpeech = this.configService.get(ENABLE_SPEECH);
+    if (enableSpeech === 'true') {
+      this.enableSpeech = true;
+    } else {
+      this.enableSpeech = false;
+    }
+    console.log('Enable speech: ', this.enableSpeech);
   }
 
   public async generateResponse(chat: Chat, userId: string): Promise<OpenAI.ChatCompletion> {
