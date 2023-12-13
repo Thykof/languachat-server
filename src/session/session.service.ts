@@ -72,20 +72,7 @@ export class SessionService {
     chatConfig.frequencyPenalty = 1;
     chatConfig.presencePenalty = 1;
     chat.config = chatConfig;
-    let baseSystemPrompt: string;
-    let levelPrompt: string;
-    try {
-      baseSystemPrompt = await this.promptService.get('base-system');
-      levelPrompt = await this.promptService.get(`level-${classroom.level}`);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    chat.messages = [
-      new Message({
-        content: `${classroom.persona.prompt}\n${baseSystemPrompt}\n${levelPrompt}\nThe topic of the session is: ${classroom.topic.prompt}\nThe language is ${classroom.language}`,
-        role: Roles.System,
-      }),
-    ];
+    chat.messages = await this.getSystemPrompts(classroom);
     const firstMessage = await this.chatService.generateResponse(chat, session.userId.toString());
     const firstMessageContent = firstMessage.choices[0].message.content;
     chat.messages.push(
@@ -103,6 +90,48 @@ export class SessionService {
     await session.save();
 
     return session;
+  }
+
+  async getSystemPrompts(classroom: Classroom): Promise<Message[]> {
+    let baseSystemPrompt: string;
+    let levelPrompt: string;
+    try {
+      baseSystemPrompt = await this.promptService.get('base-system');
+      levelPrompt = await this.promptService.get(`level-${classroom.level}`);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    return [
+      new Message({
+        content: classroom.persona.prompt,
+        role: Roles.System,
+      }),
+      new Message({
+        content: baseSystemPrompt,
+        role: Roles.System,
+      }),
+      new Message({
+        content: `The topic of the session is: ${classroom.topic.prompt}.`,
+        role: Roles.System,
+      }),
+      new Message({
+        content: levelPrompt,
+        role: Roles.System,
+      }),
+      new Message({
+        content: `The language is ${classroom.language}.`,
+        role: Roles.System,
+      }),
+    ];
+  }
+
+  async findOne(id: string): Promise<Session> {
+    return this.sessionModel.findById(id).exec();
+  }
+
+  async findAll(): Promise<Session[]> {
+    return this.sessionModel.find().exec();
   }
 
   async update(id: string, updateSessionDto: UpdateSessionDto): Promise<Session> {
@@ -139,6 +168,26 @@ export class SessionService {
       session.chat.messages.push({ content: session.classroom.finalSystemMessage, role: Roles.System, speech: null });
       session.status = SessionStatus.Ended;
     }
+
+    if (session.chat.messages.length % 5 === 0) {
+      let levelPrompt: string;
+      try {
+        levelPrompt = await this.promptService.get(`level-${session.classroom.level}`);
+      } catch (error) {
+        throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+      session.chat.messages.push(
+        new Message({
+          content: `The topic of the session is: ${session.classroom.topic.prompt}.`,
+          role: Roles.System,
+        }),
+        new Message({
+          content: levelPrompt,
+          role: Roles.System,
+        }),
+      );
+    }
+
     const assistantResponse = await this.chatService.generateResponse(session.chat, session.userId.toString());
     const content = assistantResponse.choices[0].message.content;
     const speech = await this.chatService.toSpeech(content, session.classroom.persona.voice);
