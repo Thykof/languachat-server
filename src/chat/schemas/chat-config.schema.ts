@@ -1,7 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import { Message } from './message.schema';
-import { Exclude } from 'class-transformer';
 
 export enum ChatModelName {
   GPT4Turbo = 'gpt-4-1106-preview',

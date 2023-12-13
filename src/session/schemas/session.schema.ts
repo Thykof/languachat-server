@@ -5,7 +5,6 @@ import { Types, SchemaTypes } from 'mongoose';
 import { Classroom } from 'src/classroom/schemas/classroom.schema';
 import { Exclude } from 'class-transformer';
 import { Transform } from 'class-transformer';
-import { Roles } from 'src/chat/schemas/message.schema';
 
 export type SessionDocument = HydratedDocument<Session>;
 
@@ -40,7 +39,7 @@ export class Session {
     const chat = param.value as Chat;
     return new Chat({
       config: chat.config,
-      messages: chat.messages.filter((message) => message.role !== Roles.System),
+      messages: chat.messages,
       tokenCount: chat.tokenCount,
     });
   })
