@@ -23,17 +23,19 @@ export class ClassroomService implements OnModuleInit {
   }
 
   public async initialize(): Promise<void> {
-    const existingClassroom = await this.classroomModel.findOne({ name: DEFAULTS_CLASSROOM_NAME });
-    if (!existingClassroom) {
-      console.log('Creating default classroom');
-      const classroom = new this.classroomModel();
-      classroom.name = DEFAULTS_CLASSROOM_NAME;
-      classroom.topic = await this.topicService.get(INTRODUCE_YOURSELF_TOPIC_NAME);
-      classroom.language = Language.English;
-      classroom.level = Level.Beginner;
-      classroom.persona = await this.personaService.get(MONICA_NAME);
-      classroom.finalSystemMessage = await this.promptService.get('final-system');
-      await classroom.save();
+    for (const language of Object.values(Language) as Language[]) {
+      const existingClassroom = await this.classroomModel.findOne({ language }).exec();
+      if (!existingClassroom) {
+        console.log(`Creating classroom for language ${language}`);
+        const classroom = new this.classroomModel();
+        classroom.name = DEFAULTS_CLASSROOM_NAME;
+        classroom.topic = await this.topicService.get(INTRODUCE_YOURSELF_TOPIC_NAME);
+        classroom.language = language;
+        classroom.level = Level.Beginner;
+        classroom.persona = await this.personaService.get(MONICA_NAME);
+        classroom.finalSystemMessage = await this.promptService.get('final-system');
+        await classroom.save();
+      }
     }
   }
 
