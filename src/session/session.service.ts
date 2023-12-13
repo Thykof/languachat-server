@@ -171,9 +171,7 @@ export class SessionService {
     if (session.classroom.finalSystemMessage && session.chat.tokenCount > session.maxToken) {
       session.chat.messages.push({ content: session.classroom.finalSystemMessage, role: Roles.System, speech: null });
       session.status = SessionStatus.Ended;
-    }
-
-    if (session.chat.messages.length % 5 === 0) {
+    } else if (session.chat.messages.length % 5 === 0) {
       let levelPrompt: string;
       try {
         levelPrompt = await this.promptService.get(`level-${session.classroom.level}`);
