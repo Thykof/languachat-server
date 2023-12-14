@@ -96,8 +96,8 @@ export class SessionService {
     let baseSystemPrompt: string;
     let levelPrompt: string;
     try {
-      baseSystemPrompt = await this.promptService.get('base-system');
-      levelPrompt = await this.promptService.get(`level-${classroom.level}`);
+      baseSystemPrompt = await this.promptService.getByName('base-system');
+      levelPrompt = await this.promptService.getByName(`level-${classroom.level}`);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -174,7 +174,7 @@ export class SessionService {
     } else if (session.chat.messages.length % 5 === 0) {
       let levelPrompt: string;
       try {
-        levelPrompt = await this.promptService.get(`level-${session.classroom.level}`);
+        levelPrompt = await this.promptService.getByName(`level-${session.classroom.level}`);
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
       }

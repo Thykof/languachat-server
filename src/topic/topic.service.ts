@@ -24,19 +24,29 @@ export class TopicService implements OnModuleInit {
       const topic = new this.topicModel();
       topic.name = INTRODUCE_YOURSELF_TOPIC_NAME;
       topic.description = 'introduce yourself, physical and personality description';
-      topic.prompt = `${topic.description}. ${await this.promptService.get('topic-introduce-yourself')}`;
+      topic.prompt = `${topic.description}. ${await this.promptService.getByName('topic-introduce-yourself')}`;
       await topic.save();
     }
   }
 
-  public async get(name: string): Promise<Topic> {
-    const topic = await this.topicModel.findOne({ name });
+  public async getById(id: string): Promise<Topic> {
+    const topic = await this.topicModel.findById(id);
 
     if (topic) {
       return topic;
     }
 
-    throw new Error(`Topic not found: ${name}`);
+    throw new Error(`Topic not found: ${id}`);
+  }
+
+  public async get(filter: Partial<Topic>): Promise<Topic> {
+    const topic = await this.topicModel.findOne(filter);
+
+    if (topic) {
+      return topic;
+    }
+
+    throw new Error(`Topic not found: ${Object.values(filter)}`);
   }
 
   public async findAll(): Promise<Topic[]> {

@@ -26,7 +26,7 @@ export class PromptService implements OnModuleInit {
     }
   }
 
-  public async get(name: string): Promise<string> {
+  public async getByName(name: string): Promise<string> {
     const prompt = await this.promptModel.findOne({ name });
 
     if (prompt && prompt.content) {

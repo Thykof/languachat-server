@@ -25,20 +25,30 @@ export class PersonaService implements OnModuleInit {
       const monica = new this.personaModel();
       monica.name = MONICA_NAME;
       monica.description = '';
-      monica.prompt = await this.promptService.get('persona-monica-description');
+      monica.prompt = await this.promptService.getByName('persona-monica-description');
       monica.voice = Voice.Nova;
       await monica.save();
     }
   }
 
-  public async get(name: string): Promise<Persona> {
-    const persona = await this.personaModel.findOne({ name });
+  public async getById(id: string): Promise<Persona> {
+    const persona = await this.personaModel.findById(id);
 
     if (persona) {
       return persona;
     }
 
-    throw new Error(`Persona not found: ${name}`);
+    throw new Error(`Persona not found: ${id}`);
+  }
+
+  public async get(filter: Partial<Persona>): Promise<Persona> {
+    const persona = await this.personaModel.findOne(filter);
+
+    if (persona) {
+      return persona;
+    }
+
+    throw new Error(`Persona not found: ${Object.values(filter)}`);
   }
 
   public async findAll(): Promise<Persona[]> {

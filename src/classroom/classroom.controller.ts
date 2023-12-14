@@ -1,6 +1,7 @@
-import { Controller, Get, ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, ClassSerializerInterceptor, UseInterceptors, Post, Body } from '@nestjs/common';
 import { ClassroomService } from './classroom.service';
 import { Classroom } from './schemas/classroom.schema';
+import { CreateClassroomDto } from './dtos/create-classroom.dto';
 
 @Controller('classrooms')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -19,6 +20,19 @@ export class ClassroomController {
         level: classroom.level,
         persona: classroom.persona,
       });
+    });
+  }
+
+  @Post()
+  async create(@Body() createClassroomDto: CreateClassroomDto): Promise<Classroom> {
+    const classroom = await this.classroomService.create(createClassroomDto);
+    return new Classroom({
+      _id: classroom._id,
+      name: classroom.name,
+      topic: classroom.topic,
+      language: classroom.language,
+      level: classroom.level,
+      persona: classroom.persona,
     });
   }
 }
