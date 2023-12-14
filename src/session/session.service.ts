@@ -11,7 +11,6 @@ import { Classroom } from 'src/classroom/schemas/classroom.schema';
 import { ClassroomService } from 'src/classroom/classroom.service';
 
 const MAX_TOKENS = 800;
-const DEFAULT_MODEL = 'DEFAULT_MODEL';
 
 @Injectable()
 export class SessionService {
