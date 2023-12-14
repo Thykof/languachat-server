@@ -94,4 +94,13 @@ export class ClassroomService implements OnModuleInit {
 
     return await classroom.save();
   }
+
+  public async getById(id: string): Promise<Classroom> {
+    const classroom = await this.classroomModel.findById(id).populate(['persona', 'topic']).exec();
+    if (!classroom) {
+      throw new HttpException(`Classroom not found: ${id}`, 404);
+    }
+
+    return classroom;
+  }
 }

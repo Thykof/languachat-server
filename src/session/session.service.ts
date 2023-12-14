@@ -4,13 +4,11 @@ import { Session, SessionStatus } from './schemas/session.schema';
 import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateSessionDto } from './dtos/create-session.dto';
-import { Chat } from 'src/chat/schemas/chat.schema';
 import { Message, Roles } from 'src/chat/schemas/message.schema';
 import { UpdateSessionDto } from './dtos/update-session.dto';
 import { PromptService } from 'src/prompt/prompt.service';
 import { Classroom } from 'src/classroom/schemas/classroom.schema';
-import { ConfigService } from '@nestjs/config';
-import { ChatConfig, ChatModelName } from 'src/chat/schemas/chat-config.schema';
+import { ClassroomService } from 'src/classroom/classroom.service';
 
 const MAX_TOKENS = 800;
 const DEFAULT_MODEL = 'DEFAULT_MODEL';
@@ -19,70 +17,34 @@ const DEFAULT_MODEL = 'DEFAULT_MODEL';
 export class SessionService {
   constructor(
     @InjectModel(Session.name) private sessionModel: Model<Session>,
-    @InjectModel(Chat.name) private chatModel: Model<Chat>,
-    @InjectModel(Classroom.name) private classroomModel: Model<Classroom>,
-    @InjectModel(ChatConfig.name) private chatConfigModel: Model<ChatConfig>,
     private chatService: ChatService,
     private promptService: PromptService,
-    private configService: ConfigService,
+    private classroomService: ClassroomService,
   ) {}
 
-  model: ChatModelName;
-
-  onModuleInit(): void {
-    console.log('Initializing SessionService');
-    const modelInEnv = this.configService.get(DEFAULT_MODEL);
-    if (modelInEnv && (Object.values(ChatModelName) as unknown[]).includes(modelInEnv)) {
-      this.model = modelInEnv;
-    } else {
-      console.log(`invalid model in env var '${modelInEnv}' using default model`);
-      this.model = ChatModelName.GPT4Turbo;
-    }
-    console.log('Using model: ', this.model);
-  }
-
   async create(createSessionDto: CreateSessionDto): Promise<Session> {
-    const classroom = await this.classroomModel
-      .findOne({
-        language: createSessionDto.language,
-      })
-      .populate(['persona', 'topic'])
-      .exec();
-    if (!classroom) {
-      throw new HttpException(`Classroom not found: ${Object.values(createSessionDto)}`, HttpStatus.NOT_FOUND);
+    let classroom: Classroom;
+    try {
+      classroom = await this.classroomService.getById(createSessionDto.classroomId);
+    } catch (error) {
+      throw new HttpException(`Classroom not found: ${createSessionDto.classroomId}`, HttpStatus.BAD_REQUEST);
     }
     if (!classroom.persona) {
       throw new HttpException(
         `Persona not found for classroom: ${Object.values(createSessionDto)}`,
-        HttpStatus.NOT_FOUND,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
     if (!classroom.topic) {
       throw new HttpException(
         `Topic not found for classroom: ${Object.values(createSessionDto)}`,
-        HttpStatus.NOT_FOUND,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
     const session = new this.sessionModel();
     session.userId = new mongoose.Types.ObjectId();
-    const chat = new this.chatModel();
-    const chatConfig = new this.chatConfigModel();
-    chatConfig.chatModelName = this.model;
-    chatConfig.temperature = 0.6;
-    chatConfig.frequencyPenalty = 1;
-    chatConfig.presencePenalty = 1;
-    chat.config = chatConfig;
-    chat.messages = await this.getSystemPrompts(classroom);
-    const firstMessage = await this.chatService.generateResponse(chat, session.userId.toString());
-    const firstMessageContent = firstMessage.choices[0].message.content;
-    chat.messages.push(
-      new Message({
-        content: firstMessageContent,
-        role: Roles.Assistant,
-        speech: await this.chatService.toSpeech(firstMessageContent, classroom.persona.voice),
-      }),
-    );
-    chat.tokenCount = 0; // start with 0 because we update with the total tokens used after each response
+    const messages = await this.getSystemPrompts(classroom);
+    const chat = await this.chatService.create(messages, session.userId, classroom.persona.voice);
     session.classroom = classroom;
     session.chat = chat;
     session.status = SessionStatus.Active;

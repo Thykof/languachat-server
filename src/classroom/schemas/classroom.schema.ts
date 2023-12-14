@@ -36,6 +36,9 @@ export class Classroom {
 
   @Transform((param) => {
     const topic = param.value as Topic;
+    if (!topic) {
+      return null;
+    }
     return new Topic({
       name: topic.name,
       description: topic.description,
@@ -52,6 +55,9 @@ export class Classroom {
 
   @Transform((param) => {
     const persona = param.value as Persona;
+    if (!persona) {
+      return null;
+    }
     return new Persona({
       name: persona.name,
       description: persona.description,
