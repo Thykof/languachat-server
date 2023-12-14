@@ -80,7 +80,9 @@ export class ClassroomService implements OnModuleInit {
     try {
       topic = await this.topicService.getById(createClassroomDto.topicId);
     } catch (error) {
-      throw new HttpException(`Topic not found: ${createClassroomDto.topicId}`, 400);
+      // use default topic
+      topic = await this.topicService.get({ name: INTRODUCE_YOURSELF_TOPIC_NAME });
+      // throw new HttpException(`Topic not found: ${createClassroomDto.topicId}`, 400);
     }
     classroom.topic = topic;
 

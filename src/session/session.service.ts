@@ -81,7 +81,7 @@ export class SessionService {
         role: Roles.System,
       }),
       new Message({
-        content: `The language is ${classroom.language}.`,
+        content: `The language of the session is ${classroom.language} so every answer must be only in that language.`,
         role: Roles.System,
       }),
     ];
