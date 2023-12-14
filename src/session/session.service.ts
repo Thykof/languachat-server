@@ -12,7 +12,7 @@ import { Classroom } from 'src/classroom/schemas/classroom.schema';
 import { ConfigService } from '@nestjs/config';
 import { ChatConfig, ChatModelName } from 'src/chat/schemas/chat-config.schema';
 
-const MAX_TOKENS = 1;
+const MAX_TOKENS = 800;
 const DEFAULT_MODEL = 'DEFAULT_MODEL';
 
 @Injectable()
