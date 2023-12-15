@@ -24,6 +24,7 @@ export class Chat {
         return new Message({
           content: message.content,
           role: message.role,
+          speech: message.speech,
         });
       });
   })

@@ -23,7 +23,7 @@ export class SessionController {
   }
 
   @Put(':id')
-  async update(@Param() params: UpdateSessionParams, @Body() updateSessionDto: UpdateSessionDto) {
+  async update(@Param() params: UpdateSessionParams, @Body() updateSessionDto: UpdateSessionDto): Promise<Session> {
     const session = await this.sessionService.update(params.id, updateSessionDto);
     return new Session({
       _id: session._id,
