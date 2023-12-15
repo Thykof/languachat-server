@@ -65,23 +65,12 @@ export class SessionService {
 
     return [
       new Message({
-        content: classroom.persona.prompt,
-        role: Roles.System,
-      }),
-      new Message({
-        content: baseSystemPrompt,
-        role: Roles.System,
-      }),
-      new Message({
-        content: `The topic of the session is: ${classroom.topic.prompt}.`,
-        role: Roles.System,
-      }),
-      new Message({
-        content: levelPrompt,
-        role: Roles.System,
-      }),
-      new Message({
-        content: `The language of the session is ${classroom.language} so every answer must be only in that language.`,
+        content: baseSystemPrompt
+          .replaceAll('{topic}', classroom.topic.name.toLowerCase())
+          .replaceAll('{topicPrompt}', classroom.topic.prompt)
+          .replaceAll('{language}', classroom.language)
+          .replaceAll('{levelPrompt}', levelPrompt)
+          .replaceAll('{persona}', classroom.persona.prompt),
         role: Roles.System,
       }),
     ];
@@ -130,22 +119,25 @@ export class SessionService {
     });
 
     if (session.classroom.finalSystemMessage && session.chat.tokenCount > session.maxToken) {
-      session.chat.messages.push({ content: session.classroom.finalSystemMessage, role: Roles.System, speech: null });
+      const content = session.classroom.finalSystemMessage;
+      session.chat.messages.push({
+        content,
+        role: Roles.System,
+        speech: await this.chatService.toSpeech(content, session.classroom.persona.voice),
+      });
       session.status = SessionStatus.Ended;
-    } else if (session.chat.messages.length % 5 === 0) {
+    } else if (session.chat.messages.length % 1 === 0) {
       let levelPrompt: string;
+      let topicSystemReminder: string;
       try {
         levelPrompt = await this.promptService.getByName(`level-${session.classroom.level}`);
+        topicSystemReminder = await this.promptService.getByName('topic-system-reminder');
       } catch (error) {
         throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
       }
       session.chat.messages.push(
         new Message({
-          content: `The topic of the session is: ${session.classroom.topic.prompt}.`,
-          role: Roles.System,
-        }),
-        new Message({
-          content: levelPrompt,
+          content: `${topicSystemReminder.replaceAll('{topicPrompt}', session.classroom.topic.prompt)}. ${levelPrompt}`,
           role: Roles.System,
         }),
       );
