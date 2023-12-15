@@ -10,7 +10,7 @@ import { PromptService } from 'src/prompt/prompt.service';
 import { Classroom } from 'src/classroom/schemas/classroom.schema';
 import { ClassroomService } from 'src/classroom/classroom.service';
 
-const MAX_TOKENS = 800;
+const MAX_TOKENS = 1250;
 
 @Injectable()
 export class SessionService {
