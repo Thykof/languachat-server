@@ -17,7 +17,7 @@ export class PersonaService implements OnModuleInit {
   }
 
   public async initialize(): Promise<void> {
-    const defaultPersonaNames = ['Monica', 'Pierre'];
+    const defaultPersonaNames = ['Monica', 'Pierre', 'Jason'];
     for (const name of defaultPersonaNames) {
       const existingPersona = await this.personaModel.findOne({ name });
       if (!existingPersona) {
@@ -26,7 +26,7 @@ export class PersonaService implements OnModuleInit {
         monica.name = name;
         monica.description = '';
         monica.prompt = await this.promptService.getByName(`persona-${name.toLowerCase()}-description`);
-        monica.voice = name === 'Monica' ? Voice.Nova : Voice.Onyx;
+        monica.voice = name === 'Monica' ? Voice.Nova : name === 'Jason' ? Voice.Onyx : Voice.Echo;
         await monica.save();
       }
     }

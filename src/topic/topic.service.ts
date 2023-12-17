@@ -3,8 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Topic } from './schemas/topic.schema';
 import { Model } from 'mongoose';
 import { PromptService } from 'src/prompt/prompt.service';
-
-export const INTRODUCE_YOURSELF_TOPIC_NAME = 'Introduce Yourself';
+import slugify from 'slugify';
 
 @Injectable()
 export class TopicService implements OnModuleInit {
@@ -19,13 +18,19 @@ export class TopicService implements OnModuleInit {
   }
 
   public async initialize(): Promise<void> {
-    const existingTopic = await this.topicModel.findOne({ name: INTRODUCE_YOURSELF_TOPIC_NAME });
-    if (!existingTopic) {
-      const topic = new this.topicModel();
-      topic.name = INTRODUCE_YOURSELF_TOPIC_NAME;
-      topic.description = 'introduce yourself, physical and personality description';
-      topic.prompt = `${topic.description}. ${await this.promptService.getByName('topic-introduce-yourself')}`;
-      await topic.save();
+    const defaultTopicNames = ['Introduce Yourself', 'The routine', 'Food', 'Weather'];
+    for (const name of defaultTopicNames) {
+      const existingTopic = await this.topicModel.findOne({ name });
+      if (!existingTopic) {
+        console.log(`Creating topic: ${name}`);
+        const topic = new this.topicModel();
+        topic.name = name;
+        topic.description = 'introduce yourself, physical and personality description';
+        topic.prompt = `${topic.description}. ${await this.promptService.getByName(
+          `topic-${slugify(name, { lower: true })}`,
+        )}`;
+        await topic.save();
+      }
     }
   }
 

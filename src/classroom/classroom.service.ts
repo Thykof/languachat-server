@@ -4,7 +4,7 @@ import { Classroom, Language, Level } from './schemas/classroom.schema';
 import { Model } from 'mongoose';
 import { PersonaService } from 'src/persona/persona.service';
 import { PromptService } from 'src/prompt/prompt.service';
-import { INTRODUCE_YOURSELF_TOPIC_NAME, TopicService } from 'src/topic/topic.service';
+import { TopicService } from 'src/topic/topic.service';
 import { Topic } from 'src/topic/schemas/topic.schema';
 import { Persona } from 'src/persona/schemas/persona.schema';
 import { CreateClassroomDto } from './dtos/create-classroom.dto';
@@ -59,8 +59,7 @@ export class ClassroomService {
       topic = await this.topicService.getById(createClassroomDto.topicId);
     } catch (error) {
       // use default topic
-      topic = await this.topicService.get({ name: INTRODUCE_YOURSELF_TOPIC_NAME });
-      // throw new HttpException(`Topic not found: ${createClassroomDto.topicId}`, 400);
+      throw new HttpException(`Topic not found: ${createClassroomDto.topicId}`, 400);
     }
     classroom.topic = topic;
 
