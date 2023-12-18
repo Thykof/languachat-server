@@ -30,7 +30,7 @@ export class ChatService {
   model: ChatModelName;
 
   onModuleInit(): void {
-    console.log('ChatService');
+    console.log('Initializing ChatService');
     const enableSpeech = this.configService.get(ENABLE_SPEECH);
     if (enableSpeech === 'true') {
       this.enableSpeech = true;

@@ -40,6 +40,7 @@ export class Classroom {
       return null;
     }
     return new Topic({
+      _id: topic._id,
       name: topic.name,
       description: topic.description,
     });
@@ -59,6 +60,7 @@ export class Classroom {
       return null;
     }
     return new Persona({
+      _id: persona._id,
       name: persona.name,
       description: persona.description,
       voice: persona.voice,

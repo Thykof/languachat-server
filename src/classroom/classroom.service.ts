@@ -58,7 +58,6 @@ export class ClassroomService {
     try {
       topic = await this.topicService.getById(createClassroomDto.topicId);
     } catch (error) {
-      // use default topic
       throw new HttpException(`Topic not found: ${createClassroomDto.topicId}`, 400);
     }
     classroom.topic = topic;
