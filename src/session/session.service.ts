@@ -126,7 +126,7 @@ export class SessionService {
         speech: await this.chatService.toSpeech(content, session.classroom.persona.voice),
       });
       session.status = SessionStatus.Ended;
-    } else if (session.chat.messages.length % 1 === 0) {
+    } else if (session.chat.messages.length % 7 === 0) {
       let levelPrompt: string;
       let topicSystemReminder: string;
       try {
