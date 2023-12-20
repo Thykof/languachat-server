@@ -24,11 +24,10 @@ export class TopicService implements OnModuleInit {
       if (!existingTopic) {
         console.log(`Creating topic: ${name}`);
         const topic = new this.topicModel();
+        const promptAndDescription = await this.promptService.getByName(`topic-${slugify(name, { lower: true })}`);
         topic.name = name;
-        topic.description = 'introduce yourself, physical and personality description';
-        topic.prompt = `${topic.description}. ${await this.promptService.getByName(
-          `topic-${slugify(name, { lower: true })}`,
-        )}`;
+        topic.description = promptAndDescription;
+        topic.prompt = promptAndDescription;
         await topic.save();
       }
     }
