@@ -36,21 +36,7 @@ export class TopicService implements OnModuleInit {
   public async getById(id: string): Promise<Topic> {
     const topic = await this.topicModel.findById(id);
 
-    if (topic) {
-      return topic;
-    }
-
-    throw new Error(`Topic not found: ${id}`);
-  }
-
-  public async get(filter: Partial<Topic>): Promise<Topic> {
-    const topic = await this.topicModel.findOne(filter);
-
-    if (topic) {
-      return topic;
-    }
-
-    throw new Error(`Topic not found: ${Object.values(filter)}`);
+    return topic;
   }
 
   public async findAll(): Promise<Topic[]> {

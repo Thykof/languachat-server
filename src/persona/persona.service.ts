@@ -35,21 +35,7 @@ export class PersonaService implements OnModuleInit {
   public async getById(id: string): Promise<Persona> {
     const persona = await this.personaModel.findById(id);
 
-    if (persona) {
-      return persona;
-    }
-
-    throw new Error(`Persona not found: ${id}`);
-  }
-
-  public async get(filter: Partial<Persona>): Promise<Persona> {
-    const persona = await this.personaModel.findOne(filter);
-
-    if (persona) {
-      return persona;
-    }
-
-    throw new Error(`Persona not found: ${Object.values(filter)}`);
+    return persona;
   }
 
   public async findAll(): Promise<Persona[]> {

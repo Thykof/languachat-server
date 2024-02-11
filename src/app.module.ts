@@ -8,6 +8,8 @@ import { PromptModule } from './prompt/prompt.module';
 import { TopicModule } from './topic/topic.module';
 import { ClassroomModule } from './classroom/classroom.module';
 import { PersonaModule } from './persona/persona.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -20,6 +22,9 @@ import { PersonaModule } from './persona/persona.module';
     PersonaModule,
     ClassroomModule,
     SessionModule,
+    AuthModule,
+    UserModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
