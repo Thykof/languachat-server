@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export enum ChatModelName {
-  GPT4Turbo = 'gpt-4-1106-preview',
+  GPT4Turbo = 'gpt-4-turbo',
   GPT4 = 'gpt4',
   GPT432k = 'gpt-4-32k',
   GPT35 = 'gpt-3.5-turbo',
