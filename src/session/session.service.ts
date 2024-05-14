@@ -22,10 +22,8 @@ export class SessionService {
   ) {}
 
   async create(createSessionDto: CreateSessionDto): Promise<Session> {
-    let classroom: Classroom;
-    try {
-      classroom = await this.classroomService.getById(createSessionDto.classroomId);
-    } catch (error) {
+    const classroom = await this.classroomService.getById(createSessionDto.classroomId);
+    if (!classroom) {
       throw new HttpException(`Classroom not found: ${createSessionDto.classroomId}`, HttpStatus.BAD_REQUEST);
     }
     if (!classroom.persona) {

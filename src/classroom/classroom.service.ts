@@ -38,10 +38,8 @@ export class ClassroomService {
     }
     classroom.language = language;
 
-    let persona: Persona;
-    try {
-      persona = await this.personaService.getById(createClassroomDto.personaId);
-    } catch (error) {
+    const persona = await this.personaService.getById(createClassroomDto.personaId);
+    if (!persona) {
       throw new HttpException(`Persona not found: ${createClassroomDto.personaId}`, 400);
     }
     classroom.persona = persona;
@@ -54,10 +52,8 @@ export class ClassroomService {
     }
     classroom.level = level;
 
-    let topic: Topic;
-    try {
-      topic = await this.topicService.getById(createClassroomDto.topicId);
-    } catch (error) {
+    const topic = await this.topicService.getById(createClassroomDto.topicId);
+    if (!topic) {
       throw new HttpException(`Topic not found: ${createClassroomDto.topicId}`, 400);
     }
     classroom.topic = topic;
@@ -75,9 +71,6 @@ export class ClassroomService {
 
   public async getById(id: string): Promise<Classroom> {
     const classroom = await this.classroomModel.findById(id).populate(['persona', 'topic']).exec();
-    if (!classroom) {
-      throw new HttpException(`Classroom not found: ${id}`, 404);
-    }
 
     return classroom;
   }
